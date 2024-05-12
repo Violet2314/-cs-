@@ -16,21 +16,8 @@
 class MazeGeneratorView : private GWindow {
 public:
 
-/**
- * Method: constructor
- * -------------------
- * Presents a clear graphics window so that calls to
- * drawBorder and drawWall can be made to help animate
- * the construction of a simple maze.
- */
-
     MazeGeneratorView();
 
-/**
- * Method: destructor
- * ------------------
- * Closes and otherwise destroys the MazeGeneratorView.
- */
     ~MazeGeneratorView();
 
 /**

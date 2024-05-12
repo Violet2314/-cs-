@@ -89,16 +89,13 @@ void dian(LifeDisplay &dispaly){
     char c;
     cout << "点Enter进行下一步，q可以退出" << endl;
     while(true){
-        c = std::cin.get();
+        c = std::cin.get();//这个才可以读取到换行和空格啥的
         if(c == '\n'){
-            GEvent event = waitForEvent(KEY_EVENT);
-            if (event.getEventClass() == KEY_EVENT){
-                next(dispaly);
-                draw(dispaly);
-                if(check()){
-                    cout << "已经结束了" << endl;
-                    break;
-                }
+            next(dispaly);
+            draw(dispaly);
+            if(check()){
+                cout << "已经结束了" << endl;
+                break;
             }
         }else if(c == 'q'){
             cout << "游戏结束" << endl;
@@ -113,8 +110,7 @@ void run(LifeDisplay &dispaly){
     time.start();
     while(true){
         GEvent event = waitForEvent(TIMER_EVENT + MOUSE_EVENT + KEY_EVENT);
-        if (event.getEventClass() == TIMER_EVENT ||
-            event.getEventClass() == KEY_EVENT){
+        if (event.getEventClass() == TIMER_EVENT){
             next(dispaly);
             draw(dispaly);
             if(check()){
