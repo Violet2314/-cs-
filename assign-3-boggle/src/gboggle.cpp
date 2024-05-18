@@ -149,6 +149,12 @@ void drawBoard(int numRows, int numCols) {
     drawPlayerLabel(COMPUTER, "Computer");
     gwp->repaint();
 }
+int getscore(Player player){
+    if(player == HUMAN){
+        return gState.scores[0];
+    }
+    return gState.scores[1];
+}
 
 /*
  * Function: labelCube

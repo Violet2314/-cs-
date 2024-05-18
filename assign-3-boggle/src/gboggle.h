@@ -65,6 +65,8 @@ void shutdownGBoggle();
  * an error is raised.
  */
 
+int getscore(Player player);
+
 void drawBoard(int numRows, int numCols);
 
 /*

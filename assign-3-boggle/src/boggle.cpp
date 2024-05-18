@@ -17,7 +17,18 @@
 #include "map.h"
 #include "set.h"
 #include "lexicon.h"
+#include "console.h"
 using namespace std;
+
+Lexicon english("res/dictionary.txt");
+char chars[10][10];
+unordered_map<string,int> mp;
+unordered_map<string,int> mp2;
+vector<string> allans;
+vector<string> userans;
+int vis[100];
+int dx[8] = {1,1,1,-1,-1,-1,0,0};
+int dy[8] = {1,0,-1,1,0,-1,1,-1};
 
 static const string kStandardCubes[16] = {
    "AAEEGN", "ABBJOO", "ACHOPS", "AFFKPS",
@@ -37,6 +48,40 @@ static const string kBigBoggleCubes[25] = {
 static const int kMinLength = 4;
 static const double kDelayBetweenHighlights = 100;
 static const double kDelayAfterAllHighlights = 500;
+int dimension;
+
+char getrandchar(){
+    int now1 = rand() % 25;
+    int now2 = rand() % 6;
+    return kBigBoggleCubes[now1][now2];
+}
+
+void dfs(string s,int x,int y){
+    vis[x*10 + y] = 1;
+    if(s.size() >= 4){
+        if(english.contains(s) && mp[s] != 1){
+            allans.push_back(s);
+            mp[s] = 1;
+        }
+    }
+    for(int i = 0; i <= 7; i++){
+        int xx = x + dx[i];
+        int yy = y + dy[i];
+        if(vis[xx * 10 + yy] == 1 || xx < 0 || xx >= dimension || yy < 0 || yy >= dimension) continue;
+        string ss =s + chars[xx][yy];
+        dfs(ss,xx,yy);
+    }
+    vis[x*10 + y] = 0;
+}
+
+void getallans(){
+    for(int i = 0; i <= dimension; i++){
+        for(int j = 0; j <= dimension; j++){
+            string s = "";s+=chars[i][j];
+            dfs(s,i,j);
+        }
+    }
+}
 
 /**
  * Function: welcome
@@ -103,7 +148,7 @@ static int getPreferredBoardSize() {
  * or more games of Boggle.
  */
 static void playBoggle() {
-    int dimension = getPreferredBoardSize();
+    dimension = getPreferredBoardSize();
     drawBoard(dimension, dimension);
     cout << "This is where you'd play the game of Boggle" << endl;
 }
@@ -115,12 +160,59 @@ static void playBoggle() {
  */
 int main() {
     GWindow gw(kBoggleWindowWidth, kBoggleWindowHeight);
+    srand(time(0));
+    //setConsoleSize(1000, 800);
+    //setConsoleLocation(1100, 100);
     initGBoggle(gw);
     welcome();
     if (getYesOrNo("Do you need instructions?")) giveInstructions();
     do {
         playBoggle();
+        for(int i = 0; i < dimension; i++){
+            for(int j = 0; j < dimension; j++){
+                char now = getrandchar();
+                labelCube(i,j,now);
+                chars[i][j] = now;
+            }
+        }
+        getallans();
+        cout << "\n";
+
+        string get;
+        while(true){
+            cout << "请输入可以形成的字符[输入q退出自己的输入环节]: ";
+            getline(cin,get);
+            if(get == "q"){
+                cout << "用户输入结束" << endl;
+                break;
+            }else{
+                if(mp2[get] == 1){
+                    cout << "输入的单词已经存在了" << endl;
+                    continue;
+                }
+                if(english.contains(get)){
+                    cout << "成功存入" << endl;
+                    userans.push_back(get);
+                    recordWordForPlayer(get,HUMAN);
+                    mp2[get] = 1;
+                }else{
+                    cout << "输入的单词在字典中不存在" << endl;
+                }
+            }
+        }
+        for(int i = 0; i < allans.size(); i++){
+            if(mp2[allans[i]] == 1) continue;
+            recordWordForPlayer(allans[i],COMPUTER);
+        }
+        int score1 = getscore(HUMAN);
+        int socre2 = getscore(COMPUTER);
+        if(score1 < socre2){
+            cout << "电脑赢了" << endl;
+        }else{
+            cout << "你赢了" << endl;
+        }
     } while (getYesOrNo("Would you like to play again?"));
+
     cout << "Thank you for playing!" << endl;
     shutdownGBoggle();
     return 0;
