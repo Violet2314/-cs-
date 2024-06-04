@@ -6,7 +6,7 @@ LinkedListPQueue::LinkedListPQueue() {
 }
 LinkedListPQueue::~LinkedListPQueue() {
     cell* now;
-    cell* now2 = head->next;
+    cell* now2 = head->next;//这里有问题，应改在extractMin()弹出的时候就要删的
     while(now2 != NULL){
         now = now2->next;
         delete now2;

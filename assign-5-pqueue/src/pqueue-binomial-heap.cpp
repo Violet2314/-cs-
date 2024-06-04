@@ -5,6 +5,7 @@ BinomialHeapPQueue::BinomialHeapPQueue() {
     len = 0;
 }
 BinomialHeapPQueue::~BinomialHeapPQueue() {
+    ////这里有问题，应改在extractMin()弹出的时候就要删的
     for(int i = 0; i < len; i++){
         Node* now = head[i];
         while(now != NULL){
