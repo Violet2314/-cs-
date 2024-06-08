@@ -7,8 +7,11 @@
 #pragma once
 #include <fstream>
 #include <string>
+#include <vector>
+#include <map>
 #include "tokenscanner.h"
 #include "ssview.h"
+#include "cell.h"
 
 /**
  * This is a "forward reference" which informs the compiler there is a
@@ -87,7 +90,7 @@ public:
  * and dependencies (and other information you choose to include).
  */
     
-    void printCellInformation(const std::string& cellname) const;
+    void printCellInformation(const std::string& cellname) ;
 
 /**
  * Member functions: writeToStream, readFromStream
@@ -107,9 +110,30 @@ public:
  */
 
     void writeToStream(std::ostream &outfile) const;
-	void readFromStream(std::istream &infile);
+    void readFromStream(std::istream &infile);
+
+    int getrow() const;
+    int getcol() const;
+    Cell* getcell(std::string name);
+    double getnumValue(std::string name);
+
+    void setrow(int i);
+    void setcol(int i);
+    void show();
+    void showcell(std::string cellname);
+    void clear();
+    void addformula(std::string);
+
+    std::unordered_map<std::string,Cell*> gettable() const;
+    std::vector<std::string> getformula() const;
+
 	
 private:
     /* For you to decide */
+    int numrow;
+    int numcol;
+    std::unordered_map<std::string,Cell*> table;
+    std::vector<std::string> formula;
+    SSView* view;
 };
 

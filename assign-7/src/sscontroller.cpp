@@ -21,6 +21,7 @@
 #include "ssmodel.h"
 #include "ssview.h"
 #include "console.h"
+#include "parser.h"
 using namespace std;
 
 /**
@@ -68,12 +69,15 @@ static void helpAction(TokenScanner& /* scanner */, SSModel& /* model */) {
 }
 
 static void loadAction(TokenScanner& scanner, SSModel& model) {
-	if (!scanner.hasMoreTokens()) 
+    model.clear();
+    if (!scanner.hasMoreTokens())
         error("The load command requires a file name.");
 	
     string filename;
-	while (scanner.hasMoreTokens())
-		filename += scanner.nextToken();
+    while (scanner.hasMoreTokens()){
+        filename += scanner.nextToken();
+    }
+    filename = "res/" + filename;
 	ifstream infile(filename.c_str());
 	if (infile.fail()) 
         error("Cannot open the file named \"" + filename + "\".");
@@ -86,8 +90,10 @@ static void saveAction(TokenScanner& scanner, SSModel& model) {
         error("The save command requires a file name.");
     
 	string filename;
-	while (scanner.hasMoreTokens())
+    while (scanner.hasMoreTokens()){
         filename += scanner.nextToken();
+    }
+    filename = "res/" + filename;
 	ofstream out(filename.c_str());
 	if (out.fail()) 
         error("Cannot open the file named \"" + filename + "\".");
@@ -104,6 +110,7 @@ static void setAction(TokenScanner& scanner, SSModel& model) {
 	if (scanner.nextToken() != "=") 
         error("= expected.");
 	model.setCellFromScanner(cellname, scanner);
+    model.showcell(cellname);
 }
 
 static void getAction(TokenScanner& scanner, SSModel& model) {
@@ -186,10 +193,64 @@ static void interpretCommands(Map<string, cmdFnT>& cmdTable) {
 	}
 }
 
+bool check(string now){
+    string vis[8] = {"min","max","average","mean","product","sum","median","stdev"};
+    for(int i = 0; i <= 7; i++){
+        if(now == vis[i]) return true;
+    }
+    return false;
+}
+
+void test(){
+    string filename = "res/";
+    filename += "budget.123";
+    ifstream infile(filename.c_str());
+    string line;
+    while(getline(infile,line)){
+        TokenScanner scanner(line);
+        scanner.ignoreWhitespace();
+        scanner.scanNumbers();
+        scanner.scanStrings();
+        string cellname = scanner.nextToken();
+        toLowerCaseInPlace(cellname);
+        if (scanner.nextToken() != "=")
+            error("= expected.");
+        try{
+            Expression* rhs = parseExp(scanner);
+            /* the textstring expression */
+            if(rhs->getType() == TEXTSTRING){
+                string name = rhs->toString();
+                cout << name << "\n";
+            } else if(rhs->getType() == IDENTIFIER){
+                string now = rhs->toString();
+                transform(now.begin(),now.end(),now.begin(),::tolower);
+                if(check(now)){
+                    while(scanner.hasMoreTokens()){
+                        cout << scanner.nextToken();
+                    }
+                    cout << "\n";
+                }else{
+                    cout << "2" << "\n";
+                }
+            }else if(rhs->getType() == DOUBLE){
+                cout << "1" << "\n";
+            }
+            else if(rhs->getType() == COMPOUND){
+                string name = rhs->toString();
+                if(check(name)) continue;
+                cout << name << "\n";
+            }
+        } catch(ErrorException ex){
+            cout << ex.getMessage() << endl;
+        }
+    }
+}
+
 int main() {
 	Map<string, cmdFnT> cmdTable;
-	setUpCommandTable(cmdTable);
-	interpretCommands(cmdTable);
+    //test();
+    setUpCommandTable(cmdTable);
+    interpretCommands(cmdTable);
 	return 0;
 }
 

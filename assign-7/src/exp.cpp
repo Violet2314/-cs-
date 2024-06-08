@@ -8,6 +8,8 @@
 #include "exp.h"
 #include "strlib.h"
 #include "error.h"
+#include "ssmodel.h"
+#include "cell.h"
 using namespace std;
 
 /**
@@ -18,11 +20,11 @@ using namespace std;
  */
 
 Expression::Expression() {
-   /* Empty */
+    /* Empty */
 }
 
 Expression::~Expression() {
-   /* Empty */
+    /* Empty */
 }
 
 /**
@@ -33,23 +35,24 @@ Expression::~Expression() {
  */
 
 DoubleExp::DoubleExp(double value) {
-   this->value = value;
+    this->value = value;
 }
 
-double DoubleExp::eval(EvaluationContext& /* context */) const {
-   return value;
+double DoubleExp::eval(SSModel& /*model*/, Cell* newCell) const {
+    newCell->setnumdata(value);
+    return value;
 }
 
 string DoubleExp::toString() const {
-   return realToString(value);
+    return realToString(value);
 }
 
 ExpressionType DoubleExp::getType() const {
-   return DOUBLE;
+    return DOUBLE;
 }
 
 double DoubleExp::getDoubleValue() const {
-   return value;
+    return value;
 }
 
 /**
@@ -63,7 +66,7 @@ TextStringExp::TextStringExp(const string& str) {
     this->str = str;
 }
 
-double TextStringExp::eval(EvaluationContext& /* context */) const {
+double TextStringExp::eval(SSModel& /*model*/, Cell* /* newCell */) const {
     return 0.0;
 }
 
@@ -84,28 +87,37 @@ string TextStringExp::getTextStringValue() const {
  * -----------------------------------
  * The IdentifierExp subclass represents a variable name.  The
  * implementation of eval looks up that name in the evaluation context.
+ * Preconditions: the name must be valid spreadsheet cellname and can be empty.
+ * Postcondistions: when retrived, the value of an empty or string cell will be zero.
  */
 
 IdentifierExp::IdentifierExp(const string& name) {
-   this->name = name;
+    this->name = name;
 }
 
-double IdentifierExp::eval(EvaluationContext& context) const {
-   if (!context.isDefined(name)) error(name + " is undefined");
-   return context.getValue(name);
+double IdentifierExp::eval(SSModel& model, Cell* newCell) const {
+    if(!model.nameIsValid(name)){
+        error("cellname " + name + " is not valid");
+    }
+    //add depending for the newCell
+    newCell->adddepending(model.getcell(name));
+    //add depended for identifier
+    model.getcell(name)->adddepended(newCell);
+    return model.getnumValue(name);
 }
 
 string IdentifierExp::toString() const {
-   return name;
+    return name;
 }
 
 ExpressionType IdentifierExp::getType() const {
-   return IDENTIFIER;
+    return IDENTIFIER;
 }
 
 string IdentifierExp::getIdentifierName() const {
-   return name;
+    return name;
 }
+
 
 /**
  * Implementation notes: CompoundExp
@@ -116,63 +128,44 @@ string IdentifierExp::getIdentifierName() const {
  */
 
 CompoundExp::CompoundExp(const string& op, const Expression *lhs, const Expression *rhs) {
-   this->op = op;
-   this->lhs = lhs;
-   this->rhs = rhs;
+    this->op = op;
+    this->lhs = lhs;
+    this->rhs = rhs;
 }
 
 CompoundExp::~CompoundExp() {
-   delete lhs;
-   delete rhs;
+    delete lhs;
+    delete rhs;
 }
 
-double CompoundExp::eval(EvaluationContext & context) const {
-   double right = rhs->eval(context);
-   double left = lhs->eval(context);
-   if (op == "+") return left + right;
-   if (op == "-") return left - right;  
-   if (op == "*") return left * right;
-   if (op == "/") return left / right; // divide by 0.0 gives ±INF
-    
-   error("Illegal operator in expression.");
-   return 0.0;
+double CompoundExp::eval(SSModel& model, Cell* newCell) const {
+    double right = rhs->eval(model, newCell);
+    double left = lhs->eval(model, newCell);
+    if (op == "+") return left + right;
+    if (op == "-") return left - right;
+    if (op == "*") return left * right;
+    if (op == "/") return left / right; // divide by 0.0 gives ±INF
+
+    error("Illegal operator in expression.");
+    return 0.0;
 }
 
 string CompoundExp::toString() const {
-   return '(' + lhs->toString() + ' ' + op + ' ' + rhs->toString() + ')';
+    return '(' + lhs->toString() + ' ' + op + ' ' + rhs->toString() + ')';
 }
 
 ExpressionType CompoundExp::getType() const {
-   return COMPOUND;
+    return COMPOUND;
 }
 
 string CompoundExp::getOperator() const {
-   return op;
+    return op;
 }
 
 const Expression *CompoundExp::getLHS() const {
-   return lhs;
+    return lhs;
 }
 
 const Expression *CompoundExp::getRHS() const {
-   return rhs;
-}
-
-/**
- * Implementation notes: EvaluationContext
- * ---------------------------------------
- * The methods in the EvaluationContext class simply call the appropriate
- * method on the map used to represent the symbol table.
- */
-
-void EvaluationContext::setValue(const string& var, double value) {
-   symbolTable.put(var, value);
-}
-
-double EvaluationContext::getValue(const string& var) const {
-   return symbolTable.get(var);
-}
-
-bool EvaluationContext::isDefined(const string& var) const {
-   return symbolTable.containsKey(var);
+    return rhs;
 }

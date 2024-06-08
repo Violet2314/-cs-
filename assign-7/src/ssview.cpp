@@ -30,8 +30,8 @@ using namespace std;
  * exported functions, please see the interface file.
  */
 
-static const double kRowHeight = 15;
-static const double kColWidth = 96;
+static const double kRowHeight = 20;
+static const double kColWidth = 108;
 static const double kRowHeaderWidth = 22;
 static const double kColHeaderHeight = 15;
 static const double kHighlightPauseTime = 10;
@@ -43,7 +43,7 @@ enum alignment {
     RightAligned 
 };	// for text alignments
 
-static const string kWindowTitle = "Stanford 1-2-3";
+static const string kWindowTitle = "广财小菜鸡表格";
 
 static const string kHeaderBackgroundColor = "#CCCCCC";
 static const string kGridLineColor = "LightGray";
@@ -59,8 +59,8 @@ static const string kBoldFont = "Courier-BOLD-12";
 SSView::SSView(): GWindow(kRowHeaderWidth + kNumColsDisplayed * kColWidth,
                           kColHeaderHeight + kNumRowsDisplayed * kRowHeight) {
 	setWindowTitle(kWindowTitle);
-	cellHeight = (getHeight() - kColHeaderHeight)/kNumRowsDisplayed;
-	cellWidth = (getWidth() - kRowHeaderWidth)/kNumColsDisplayed;
+    cellHeight = (getHeight() - kColHeaderHeight)/kNumRowsDisplayed;
+    cellWidth = (getWidth() - kRowHeaderWidth)/kNumColsDisplayed;
     displayEmptySpreadsheet();
 }
 
@@ -75,7 +75,11 @@ void SSView::displayEmptySpreadsheet() {
 	repaint();
     setRepaintImmediately(true);
 }
-  	  	
+
+void SSView::displayCell(const Cell* cell,bool highlightPause){
+    displayCell(cell->getCellName(),cell->getstrdata(),highlightPause);
+}
+
 void SSView::displayCell(const string& cellname, 
                          const string& txt, bool highlightPause) {
 	drawOneCell(cellname, txt, RightAligned, 
@@ -93,7 +97,7 @@ void SSView::drawOneCell(const string& cellname, const string& contents,
 		drawAndFillRect(r, bgColor, bgColor);
 	else {
 		double x, y;
-		if (align == LeftAligned) x = r.x + 4;
+        if (align == LeftAligned) x = r.x + 4;
 		else if (align == Centered) x = r.x + cellWidth / 2;
         else x = r.x + cellWidth - 4;
 		y = r.y + cellHeight - 4;

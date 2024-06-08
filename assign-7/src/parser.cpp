@@ -1,3 +1,4 @@
+
 /*
  * File: parser.cpp
  * ----------------
@@ -26,7 +27,11 @@ static int precedence(const std::string& token);
 Expression *parseExp(TokenScanner& scanner) {
    Expression *exp = readE(scanner);
    if (scanner.hasMoreTokens()) {
-      error("Unexpected token \"" + scanner.nextToken() + "\"");
+       string wok = scanner.nextToken();
+       if(wok != "(" && wok != ")") {
+           //cout << (wok == "(") << "\n";
+           error("Unexpected token \"" + wok + "\"");
+       }
    }
    return exp;
 }

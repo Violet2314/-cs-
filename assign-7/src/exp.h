@@ -8,12 +8,9 @@
 #define _exp_
 
 #include <string>
-#include "map.h"
+#include "ssmodel.h"
+#include "cell.h"
 #include "tokenscanner.h"
-
-/* Forward reference */
-
-class EvaluationContext;
 
 /*
  * Type: ExpressionType
@@ -45,16 +42,16 @@ class Expression {
 
 public:
 
-/**
+    /**
  * Constructor: Expression
  * -----------------------
  * Specifies the constructor for the base Expression class.  Each subclass
  * constructor will define its own constructor.
  */
 
-   Expression();
+    Expression();
 
-/**
+    /**
  * Destructor: ~Expression
  * Usage: delete exp;
  * ------------------
@@ -63,28 +60,28 @@ public:
  * is called when deleting an expression.
  */
 
-   virtual ~Expression();
+    virtual ~Expression();
 
-/**
+    /**
  * Method: eval
- * Usage: int value = exp->eval(context);
+ * Usage: int value = exp->eval(model);
  * --------------------------------------
- * Evaluates this expression and returns its value in the context of
- * the specified EvaluationContext object.
+ * Evaluates this expression and returns its value in the to of
+ * the specified SSmodel object.
  */
 
-   virtual double eval(EvaluationContext& context) const = 0;
+    virtual double eval(SSModel& model, Cell* newCell) const = 0;
 
-/**
+    /**
  * Method: toString
  * Usage: string str = exp->toString();
  * ------------------------------------
  * Returns a string representation of this expression.
  */
 
-   virtual std::string toString() const = 0;
+    virtual std::string toString() const = 0;
 
-/**
+    /**
  * Method: type
  * Usage: ExpressionType type = exp->getType();
  * --------------------------------------------
@@ -92,7 +89,7 @@ public:
  * DOUBLE, TEXTSTRING, IDENTIFIER, and COMPOUND.
  */
 
-   virtual ExpressionType getType() const = 0;
+    virtual ExpressionType getType() const = 0;
 };
 
 /**
@@ -105,26 +102,26 @@ class DoubleExp : public Expression {
 
 public:
 
-/**
+    /**
  * Constructor: DoubleExp
  * Usage: Expression *exp = new DoubleExp(value);
  * -------------------------------------------------
  * The constructor creates a new double constant expression.
  */
 
-   DoubleExp(double value);
+    DoubleExp(double value);
 
-/* Prototypes for the virtual methods overridden by this class */
+    /* Prototypes for the virtual methods overridden by this class */
 
-   double eval(EvaluationContext& context) const;
-   std::string toString() const;
-   ExpressionType getType() const;
-    
-/* Prototypes of methods specific to this class */
-   double getDoubleValue() const;
+    double eval(SSModel& /*model*/, Cell* newCell) const;
+    std::string toString() const;
+    ExpressionType getType() const;
+
+    /* Prototypes of methods specific to this class */
+    double getDoubleValue() const;
 
 private:
-   double value;                   /* The value of the double constant */
+    double value;                   /* The value of the double constant */
 };
 
 /**
@@ -134,27 +131,27 @@ private:
  */
 
 class TextStringExp : public Expression {
-    
+
 public:
-    
-/**
- * Constructor: TextStringExp 
+
+    /**
+ * Constructor: TextStringExp
  * Usage: Expression *exp = new TextStringExp(str);
  * ------------------------------------------------
  * The constructor creates a new text string constant expression.
  */
-    
+
     TextStringExp(const std::string& str);
-    
-/* Prototypes for the virtual methods overridden by this class */
-    
-    double eval(EvaluationContext& context) const;
+
+    /* Prototypes for the virtual methods overridden by this class */
+
+    double eval(SSModel& /*model*/, Cell* /* newCell */) const;
     std::string toString() const;
     ExpressionType getType() const;
 
-/* Prototypes of methods specific to this class */
+    /* Prototypes of methods specific to this class */
     std::string getTextStringValue() const;
-    
+
 private:
     std::string str;              /* The value of the text string constant */
 };
@@ -169,26 +166,30 @@ class IdentifierExp : public Expression {
 
 public:
 
-/**
+    /**
  * Constructor: IdentifierExp
  * Usage: Expression *exp = new IdentifierExp(name);
  * -------------------------------------------------
  * The constructor creates an identifier expression with the specified name.
  */
 
-   IdentifierExp(const std::string& name);
+    IdentifierExp(const std::string& name);
 
-/* Prototypes for the virtual methods overridden by this class */
+    /* Prototypes for the virtual methods overridden by this class */
+    /**
+    * Method: eval
+    * Usage: exp.eval()
+    * --------------------
+    * Return the value in the indentifier.
+    */
+    double eval(SSModel& model, Cell* newCell) const;
+    std::string toString() const;
+    ExpressionType getType() const;
 
-   double eval(EvaluationContext& context) const;
-   std::string toString() const;
-   ExpressionType getType() const;
-
-/* Prototypes of methods specific to this class */
-   std::string getIdentifierName() const;
-
+    /* Prototypes of methods specific to this class */
+    std::string getIdentifierName() const;
 private:
-   std::string name;            /* The name of the identifier */
+    std::string name;            /* The name of the identifier */
 };
 
 /**
@@ -202,7 +203,7 @@ class CompoundExp : public Expression {
 
 public:
 
-/**
+    /**
  * Constructor: CompoundExp
  * Usage: Expression *exp = new CompoundExp(op, lhs, rhs);
  * -------------------------------------------------------
@@ -210,65 +211,24 @@ public:
  * the operator (op) and the left and right subexpression (lhs and rhs).
  */
 
-   CompoundExp(const std::string& op, const Expression *lhs, const Expression *rhs);
+    CompoundExp(const std::string& op, const Expression *lhs, const Expression *rhs);
 
-/* Prototypes for the virtual methods overridden by this class */
+    /* Prototypes for the virtual methods overridden by this class */
 
-   virtual ~CompoundExp();
-   virtual double eval(EvaluationContext& context) const;
-   virtual std::string toString() const;
-   virtual ExpressionType getType() const;
+    virtual ~CompoundExp();
+    virtual double eval(SSModel& model, Cell* newCell) const;
+    virtual std::string toString() const;
+    virtual ExpressionType getType() const;
 
-/* Prototypes of methods specific to this class */
-   std::string getOperator() const;
-   const Expression *getLHS() const;
-   const Expression *getRHS() const;
-
-private:
-   std::string op;              /* The operator string (+, -, *, /)  */
-   const Expression *lhs, *rhs; /* The left and right subexpression  */
-};
-
-/**
- * Class: EvaluationContext
- * ------------------------
- * This class encapsulates the information that the evaluator needs to
- * know in order to evaluate an expression.
- */
-
-class EvaluationContext {
-
-public:
-
-/**
- * Method: setValue
- * Usage: context.setValue(var, value);
- * ------------------------------------
- * Sets the value associated with the specified var.
- */
-
-   void setValue(const std::string& var, double value);
-
-/**
- * Method: getValue
- * Usage: int value = context.getValue(var);
- * -----------------------------------------
- * Returns the value associated with the specified variable.
- */
-
-   double getValue(const std::string& var) const;
-
-/**
- * Method: isDefined
- * Usage: if (context.isDefined(var)) . . .
- * ----------------------------------------
- * Returns true if the specified variable is defined.
- */
-
-   bool isDefined(const std::string& var) const;
+    /* Prototypes of methods specific to this class */
+    std::string getOperator() const;
+    const Expression *getLHS() const;
+    const Expression *getRHS() const;
 
 private:
-   Map<std::string, double> symbolTable;
+    std::string op;              /* The operator string (+, -, *, /)  */
+    const Expression *lhs, *rhs; /* The left and right subexpression  */
 };
+
 
 #endif

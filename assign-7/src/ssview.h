@@ -8,6 +8,7 @@
 #pragma once
 #include <string>
 #include "gwindow.h"
+#include "cell.h"
 
 /*********************************************************
  * NOTE: DO NOT EDIT THIS CLASS UNLESS DOING EXTENSIONS. *
@@ -72,6 +73,7 @@ public:
  * the changed cell by drawing in inverse, pausing briefly, and then re-drawing 
  * normally. 
  */
+    void displayCell(const Cell*,bool highlightPause = false);
   	
     void displayCell(const std::string& cellname, const std::string& txt, 
                      bool highlightPause = false);
