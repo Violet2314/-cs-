@@ -156,27 +156,42 @@ debug/cell.o: ../assign-7/src/cell.cpp ../assign-7/src/cell.h \
 		../assign-7/src/ssutil.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\cell.o ..\assign-7\src\cell.cpp
 
-debug/exp.o: ../assign-7/src/exp.cpp ../assign-7/src/exp.h
+debug/exp.o: ../assign-7/src/exp.cpp ../assign-7/src/exp.h \
+		../assign-7/src/ssmodel.h \
+		../assign-7/src/ssview.h \
+		../assign-7/src/cell.h \
+		../assign-7/src/ssutil.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\exp.o ..\assign-7\src\exp.cpp
 
 debug/parser.o: ../assign-7/src/parser.cpp ../assign-7/src/exp.h \
+		../assign-7/src/ssmodel.h \
+		../assign-7/src/ssview.h \
+		../assign-7/src/cell.h \
+		../assign-7/src/ssutil.h \
 		../assign-7/src/parser.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\parser.o ..\assign-7\src\parser.cpp
 
 debug/sscontroller.o: ../assign-7/src/sscontroller.cpp ../assign-7/src/ssutil.h \
 		../assign-7/src/ssmodel.h \
-		../assign-7/src/ssview.h
+		../assign-7/src/ssview.h \
+		../assign-7/src/cell.h \
+		../assign-7/src/parser.h \
+		../assign-7/src/exp.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\sscontroller.o ..\assign-7\src\sscontroller.cpp
 
 debug/ssmodel.o: ../assign-7/src/ssmodel.cpp ../assign-7/src/ssmodel.h \
 		../assign-7/src/ssview.h \
-		../assign-7/src/exp.h
+		../assign-7/src/cell.h \
+		../assign-7/src/ssutil.h \
+		../assign-7/src/exp.h \
+		../assign-7/src/parser.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\ssmodel.o ..\assign-7\src\ssmodel.cpp
 
 debug/ssutil.o: ../assign-7/src/ssutil.cpp ../assign-7/src/ssutil.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\ssutil.o ..\assign-7\src\ssutil.cpp
 
 debug/ssview.o: ../assign-7/src/ssview.cpp ../assign-7/src/ssview.h \
+		../assign-7/src/cell.h \
 		../assign-7/src/ssutil.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\ssview.o ..\assign-7\src\ssview.cpp
 

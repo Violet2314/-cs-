@@ -102,7 +102,9 @@ int main() {
         M.addAllWalls(walls);
         while(find(root[1]) != find(root[dimension * dimension])){
             removethewall(M);
+            //cout << root[1] << " " << root[dimension * dimension] << "\n";
         }
+        //cout << root[1] << " " << root[dimension * dimension] << "\n";
         M.repaint();
         cout << "尺寸是 " << dimension << "." << endl;
     }

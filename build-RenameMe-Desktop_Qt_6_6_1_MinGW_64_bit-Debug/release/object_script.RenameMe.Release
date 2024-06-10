@@ -1,0 +1,11 @@
+release/Common.o
+release/DisasterParser.o
+release/DisasterVisualizer.o
+release/DoctorsWithoutOrdersParser.o
+release/ElectionParser.o
+release/ElectionVisualizer.o
+release/Main.o
+release/Printing.o
+release/RecursionToTheRescue.o
+release/TestDriver.o
+release/TheWindow.o

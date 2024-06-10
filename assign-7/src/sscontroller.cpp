@@ -69,7 +69,7 @@ static void helpAction(TokenScanner& /* scanner */, SSModel& /* model */) {
 }
 
 static void loadAction(TokenScanner& scanner, SSModel& model) {
-    model.clear();
+    //model.clear();
     if (!scanner.hasMoreTokens())
         error("The load command requires a file name.");
 	
