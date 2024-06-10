@@ -5,12 +5,12 @@ https://zhuanlan.zhihu.com/p/659784628
 # Lab
 ## [[lab1 game-of-life]]
 生命游戏
-![[PixPin_2024-06-10_09-48-37.png]]
+![](https://github.com/Violet2314/-cs-/blob/master/pic/PixPin_2024-06-10_09-48-37.png)
 ## [[lab2 adts]]
 三个小游戏
-![[PixPin_2024-06-10_09-52-57.png]]
-![[PixPin_2024-06-10_09-51-46.png]]
-![[PixPin_2024-06-10_09-50-45.png]]
+![](https://github.com/Violet2314/-cs-/blob/master/pic/PixPin_2024-06-10_09-51-46.png)
+![](https://github.com/Violet2314/-cs-/blob/master/pic/PixPin_2024-06-10_09-52-57.png)
+![](https://github.com/Violet2314/-cs-/blob/master/pic/PixPin_2024-06-10_09-51-46.png)
 
 ## [[lab3 boggle]]
 ![[PixPin_2024-06-10_10-02-55.png]]
